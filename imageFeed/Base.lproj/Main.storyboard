@@ -34,6 +34,7 @@
                                                         <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
                                                             <integer key="value" value="16"/>
                                                         </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds = true" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hGp-Be-c3W" userLabel="Date Label">
@@ -58,9 +59,9 @@
                                                     </userDefinedRuntimeAttributes>
                                                 </view>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N94-VQ-U5q" userLabel="Like Button">
-                                                    <rect key="frame" x="358" y="4" width="66" height="44"/>
+                                                    <rect key="frame" x="380" y="4" width="44" height="44"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="44" id="EBe-6x-4WU"/>
+                                                        <constraint firstAttribute="width" constant="44" id="EBe-6x-4WU"/>
                                                         <constraint firstAttribute="height" constant="44" id="Xf2-XW-AkL"/>
                                                     </constraints>
                                                     <state key="normal" title="Button"/>
@@ -76,7 +77,6 @@
                                                 <constraint firstItem="WMp-co-CqH" firstAttribute="trailing" secondItem="wiF-ei-Fie" secondAttribute="trailing" id="Ljf-hG-IGY"/>
                                                 <constraint firstItem="N94-VQ-U5q" firstAttribute="top" secondItem="wiF-ei-Fie" secondAttribute="top" id="UvO-Z0-JNv"/>
                                                 <constraint firstItem="wiF-ei-Fie" firstAttribute="leading" secondItem="IGJ-1e-nvX" secondAttribute="leading" constant="16" id="fHu-so-8F9"/>
-                                                <constraint firstItem="N94-VQ-U5q" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="IGJ-1e-nvX" secondAttribute="leading" constant="8" id="j7C-fd-tWc"/>
                                                 <constraint firstAttribute="trailing" secondItem="wiF-ei-Fie" secondAttribute="trailing" constant="16" id="lpq-xG-5A3"/>
                                                 <constraint firstItem="WMp-co-CqH" firstAttribute="bottom" secondItem="wiF-ei-Fie" secondAttribute="bottom" id="mpv-LJ-YgR"/>
                                                 <constraint firstItem="wiF-ei-Fie" firstAttribute="top" secondItem="IGJ-1e-nvX" secondAttribute="top" constant="4" id="vCS-sG-SFe"/>
