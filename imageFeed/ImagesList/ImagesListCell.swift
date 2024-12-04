@@ -12,9 +12,7 @@ final class ImagesListCell: UITableViewCell {
     // MARK: - @IBOutlet properties
     
     @IBOutlet var cellImage: UIImageView!
-    
     @IBOutlet var dateLabel: UILabel!
-    
     @IBOutlet var likeButton: UIButton!
     
     // MARK: - Static properties

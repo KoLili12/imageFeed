@@ -9,23 +9,27 @@ import UIKit
 
 final class ImagesListViewController: UIViewController {
     
-    private let photosName: [String] = Array(0..<20).map{ "\($0)" }
+    // MARK: - Private properties
     
+    private let photosName: [String] = Array(0..<20).map{ "\($0)" }
+    private let currentDate = Date()
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
         formatter.timeStyle = .none
         return formatter
     }()
+    
+    // MARK: - @IBOutlet properties
 
     @IBOutlet private var tableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
-
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
     }
-
 }
+
+// MARK: - UITableViewDataSource
 
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -34,7 +38,6 @@ extension ImagesListViewController: UITableViewDataSource {
         guard let imageListCell = cell as? ImagesListCell else {
             return UITableViewCell()
         }
-        
         configCell(for: imageListCell, with: indexPath)
         return imageListCell
     }
@@ -42,7 +45,7 @@ extension ImagesListViewController: UITableViewDataSource {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         guard let photo = UIImage(named: photosName[indexPath.row]) else { return }
         cell.cellImage?.image = photo
-        cell.dateLabel?.text = dateFormatter.string(from: Date())
+        cell.dateLabel?.text = dateFormatter.string(from: currentDate)
         let isLiked = indexPath.row % 2 == 0
         let likeImage = isLiked ? UIImage(named: "ActiveLike") : UIImage(named: "InactiveLike")
         cell.likeButton.setImage(likeImage, for: .normal)
@@ -52,6 +55,8 @@ extension ImagesListViewController: UITableViewDataSource {
         photosName.count
     }
 }
+
+// MARK: - UITableViewDelegate
 
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

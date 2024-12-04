@@ -10,13 +10,17 @@ import UIKit
 @IBDesignable
 final class GradientView: UIView {
     
+    // MARK: - @IBInspectable properties
+    
     @IBInspectable public var topColor: UIColor = UIColor.clear
     @IBInspectable public var bottomColor: UIColor = UIColor(named: "YP Background (iOS)") ?? UIColor.black
     
-    private var startPointX: CGFloat = 0.5
-    private var startPointY: CGFloat = 0
-    private var endPointX: CGFloat = 0.5
-    private var endPointY: CGFloat = 1
+    // MARK: - Private properties
+    
+    private let startPointX: CGFloat = 0.5
+    private let startPointY: CGFloat = 0
+    private let endPointX: CGFloat = 0.5
+    private let endPointY: CGFloat = 1
     
     override func layoutSubviews() {
         let gradientLayer = CAGradientLayer()
