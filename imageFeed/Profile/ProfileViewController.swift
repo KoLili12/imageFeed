@@ -9,36 +9,72 @@ import UIKit
 
 final class ProfileViewController:UIViewController {
     
+    // MARK: - Private properties
+    
+    private let avatarImage: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "WomanAvatar")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.heightAnchor.constraint(equalToConstant: 70),
+            imageView.widthAnchor.constraint(equalToConstant: 70)
+            ])
+        return imageView
+    }()
+    
+    private let nameLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Екатерина Новикова"
+        label.font = UIFont.systemFont(ofSize: 23, weight: .bold)
+        label.textColor = .ypWhiteIOS
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let identifierLabel: UILabel = {
+        let label = UILabel()
+        label.text = "@eka_novikova"
+        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        label.textColor = .ypGrayIOS
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Hello, world!"
+        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        label.textColor = .ypWhiteIOS
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let avatar = avatarImage()
-        let name = nameLabel()
-        let id = identifierLabel()
-        let description = descriptionLabel()
         let exit = exitButton()
         
-        view.addSubview(avatar)
-        view.addSubview(name)
-        view.addSubview(id)
-        view.addSubview(description)
+        view.addSubview(avatarImage)
+        view.addSubview(nameLabel)
+        view.addSubview(identifierLabel)
+        view.addSubview(descriptionLabel)
         view.addSubview(exit)
         
         NSLayoutConstraint.activate([
-            avatar.topAnchor.constraint(equalTo: view.topAnchor, constant: 76),
-            avatar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            name.topAnchor.constraint(equalTo: avatar.bottomAnchor, constant: 8),
-            name.leadingAnchor.constraint(equalTo: avatar.leadingAnchor),
-            id.topAnchor.constraint(equalTo: name.bottomAnchor, constant: 8),
-            id.leadingAnchor.constraint(equalTo: avatar.leadingAnchor),
-            description.topAnchor.constraint(equalTo: id.bottomAnchor, constant: 8),
-            description.leadingAnchor.constraint(equalTo: avatar.leadingAnchor),
-            exit.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
+            avatarImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 76),
+            avatarImage.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            nameLabel.topAnchor.constraint(equalTo: avatarImage.bottomAnchor, constant: 8),
+            nameLabel.leadingAnchor.constraint(equalTo: avatarImage.leadingAnchor),
+            identifierLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
+            identifierLabel.leadingAnchor.constraint(equalTo: avatarImage.leadingAnchor),
+            descriptionLabel.topAnchor.constraint(equalTo: identifierLabel.bottomAnchor, constant: 8),
+            descriptionLabel.leadingAnchor.constraint(equalTo: avatarImage.leadingAnchor),
+            exit.centerYAnchor.constraint(equalTo: avatarImage.centerYAnchor),
             exit.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24)
         ])
     }
     
-    // MARK: - Private function
+    // MARK: - Private functions
     
     @objc private func didTapExitButton() {
         let alert = UIAlertController(title: "Пока, пока!", message: "Уверены что хотите выйти?", preferredStyle: .alert)
@@ -58,43 +94,7 @@ final class ProfileViewController:UIViewController {
         
     }
     
-    private func avatarImage() -> UIImageView {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "WomanAvatar")
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            imageView.heightAnchor.constraint(equalToConstant: 70),
-            imageView.widthAnchor.constraint(equalToConstant: 70)
-            ])
-        return imageView
-    }
-    
-    private func nameLabel() -> UILabel {
-        let label = UILabel()
-        label.text = "Екатерина Новикова"
-        label.font = UIFont.systemFont(ofSize: 23, weight: .bold)
-        label.textColor = .ypWhiteIOS
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }
-    
-    private func identifierLabel() -> UILabel {
-        let label = UILabel()
-        label.text = "@eka_novikova"
-        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        label.textColor = .ypGrayIOS
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }
-    
-    private func descriptionLabel() -> UILabel {
-        let label = UILabel()
-        label.text = "Hello, world!"
-        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        label.textColor = .ypWhiteIOS
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }
+    // MARK: - Private functions
     
     private func exitButton() -> UIButton {
         let button = UIButton.systemButton(with: UIImage(named: "Exit") ?? UIImage(), target: self, action: #selector(self.didTapExitButton))
