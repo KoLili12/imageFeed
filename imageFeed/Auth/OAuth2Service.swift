@@ -13,6 +13,11 @@ final class OAuth2Service {
     
     static let shared = OAuth2Service()
     
+    // MARK: - Private properties
+    
+    private var task: URLSessionTask?
+    private var lastCode: String?
+    
     private init() {}
     
     // MARK: - Private functions
@@ -43,31 +48,25 @@ final class OAuth2Service {
     // MARK: - Internal functions
     
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
+        assert(Thread.isMainThread, "Ошибка: Функция должна быть вызвана на главном потоке")
+        guard lastCode != code else {
+            completion(.failure(FetchError.invalidRequest))
+            return
+        }
+        task?.cancel()
+        lastCode = code
         let request = createURLRequest(code: code)
-        let task = URLSession.shared.data(for: request) { result in
+        let task = URLSession.shared.objectData(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             switch result {
             case .failure(let error):
-                switch error {
-                case NetworkError.urlSessionError:
-                    print("сетевая ошибка")
-                case NetworkError.httpStatusCode(let status):
-                    print("ошибка, которую вернул сервис Unsplash: \(status)")
-                case NetworkError.urlRequestError(let requestError):
-                    print("сетевая ошибка: \(requestError)")
-                default:
-                    print("неизвестная ошибка")
-                }
                 completion(.failure(error))
             case .success(let data):
-                do {
-                    let token = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                    completion(.success(token.accessToken))
-                } catch {
-                    completion(.failure(error))
-                    print("ошибка, которую выкинул декодер при получении OAuthTokenResponseBody")
-                }
+                completion(.success(data.accessToken))
             }
+            self?.task = nil
+            self?.lastCode = nil
         }
+        self.task = task
         task.resume()
     }
 }

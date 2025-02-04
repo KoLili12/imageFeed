@@ -6,10 +6,15 @@
 //
 
 import UIKit
+import Kingfisher
 
-final class ProfileViewController:UIViewController {
+final class ProfileViewController: UIViewController {
     
     // MARK: - Private properties
+
+    private let tokenStorage = OAuth2TokenStorage()
+    private let profileService = ProfileService.shared
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     private let avatarImage: UIImageView = {
         let imageView = UIImageView()
@@ -54,6 +59,8 @@ final class ProfileViewController:UIViewController {
         
         let exit = exitButton()
         
+        self.view.backgroundColor = .ypBlackIOS
+        
         view.addSubview(avatarImage)
         view.addSubview(nameLabel)
         view.addSubview(identifierLabel)
@@ -72,10 +79,31 @@ final class ProfileViewController:UIViewController {
             exit.centerYAnchor.constraint(equalTo: avatarImage.centerYAnchor),
             exit.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24)
         ])
+        
+        let profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.didChangeNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            self.updateAvater()
+        }
+        updateAvater()
+        
+        updateProfileDetails(profile: profileService.profile)
+        
+        
     }
     
     // MARK: - Private functions
     
+    private func updateAvater() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        let processor = RoundCornerImageProcessor(cornerRadius: 61)
+        avatarImage.kf.setImage(with: url, options: [.processor(processor)])
+    }
     @objc private func didTapExitButton() {
         let alert = UIAlertController(title: "Пока, пока!", message: "Уверены что хотите выйти?", preferredStyle: .alert)
         
@@ -105,5 +133,11 @@ final class ProfileViewController:UIViewController {
             button.widthAnchor.constraint(equalToConstant: 44),
         ])
         return button
+    }
+    
+    func updateProfileDetails(profile: Profile?) {
+        nameLabel.text = profile?.name ?? ""
+        identifierLabel.text = profile?.loginName ?? ""
+        descriptionLabel.text = profile?.bio
     }
 }

@@ -13,17 +13,36 @@ class SplashViewController: UIViewController {
     
     private let showAuthenticationScreenSegueIdentifier = "showAuthenticationScreen"
     private let storage = OAuth2TokenStorage()
+    private let profileService = ProfileService.shared
+    
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "launchScreenLogo"))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
     
     // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .ypBlackIOS
+        view.addSubview(logoImageView)
+        NSLayoutConstraint.activate([
+            logoImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+           logoImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
+            ])
+    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if let token = storage.token {
-            switchToTabBarController()
-            print(token)
+            fetchProfile(token)
         }
         else {
-            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            let viewController = AuthViewController()
+            viewController.delegate = self
+            viewController.modalPresentationStyle = .fullScreen
+            present(viewController, animated: true)
         }
     }
     
@@ -44,27 +63,61 @@ class SplashViewController: UIViewController {
         window.rootViewController = tabBarController
     }
     
-}
-
-// MARK: - Prepare function
-
-extension SplashViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Проверим, что переходим на авторизацию
-        if segue.identifier == showAuthenticationScreenSegueIdentifier {
-            guard
-                let navigationController = segue.destination as? UINavigationController,
-                let viewController = navigationController.viewControllers[0] as? AuthViewController
-            else {
-                assertionFailure("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")
-                return
+    private func fetchProfile(_ token: String) {
+        UIBlockingProgressHUD.show()
+        profileService.fetchProfile(token) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let profile):
+                ProfileImageService.shared.fetchProfileImageURL(username: profile.username, token: token) { imageString in
+                    switch imageString {
+                    case .success(let urlString):
+                        print("urlString: \(urlString)")
+                    case .failure(let error):
+                        switch error {
+                        case NetworkError.urlSessionError:
+                            print("сетевая ошибка [fetchProfileImageURL]")
+                        case NetworkError.httpStatusCode(let status):
+                            print("ошибка, которую вернул сервис Unsplash: \(status) [fetchProfileImageURL]")
+                        case NetworkError.urlRequestError(let requestError):
+                            print("сетевая ошибка: \(requestError) [fetchProfileImageURL]")
+                        case FetchError.invalidRequest:
+                            print("Ошикаб при создании URLRequest [fetchProfileImageURL]")
+                        case FetchError.invalidDecoding:
+                            print("ошибка, которую выкинул декодер при получении Profile [fetchProfileImageURL]")
+                        case FetchError.alreadyFetching:
+                            print("данные уже извлекаются [fetchProfileImageURL]")
+                        case FetchError.keyError:
+                            print("Ошибка извлечения ключа из UserResult.profileImage [fetchProfileImageURL]")
+                        default:
+                            print("неизвестная ошибка [fetchProfileImageURL]")
+                        }
+                    }
+                }
+                self.switchToTabBarController()
+            case .failure(let error):
+                switch error {
+                case NetworkError.urlSessionError:
+                    print("сетевая ошибка [fetchProfile]")
+                case NetworkError.httpStatusCode(let status):
+                    print("ошибка, которую вернул сервис Unsplash: \(status) [fetchProfile]")
+                case NetworkError.urlRequestError(let requestError):
+                    print("сетевая ошибка: \(requestError) [fetchProfile]")
+                case FetchError.invalidRequest:
+                    print("Ошикаб при создании URLRequest")
+                case FetchError.invalidDecoding:
+                    print("ошибка, которую выкинул декодер при получении Profile [fetchProfile]")
+                case FetchError.alreadyFetching:
+                    print("данные уже извлекаются [fetchProfile]")
+                default:
+                    print("неизвестная ошибка [fetchProfile]")
+                }
             }
-            // Установим делегатом контроллера наш SplashViewController
-            viewController.delegate = self
-        } else {
-            super.prepare(for: segue, sender: sender)
         }
     }
+    
 }
 
 // MARK: - AuthViewControllerDelegate
@@ -72,8 +125,11 @@ extension SplashViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
-        switchToTabBarController()
+        
+        guard let token = storage.token else {
+            return
+        }
+        
+        fetchProfile(token)
     }
-    
-    
 }

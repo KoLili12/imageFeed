@@ -10,6 +10,8 @@ import UIKit
 
 final class WebViewViewController: UIViewController {
     
+    private var estimatedProgessObservation: NSKeyValueObservation?
+    
     // MARK: - Internal properties
     
     weak var delegate: WebViewViewControllerDelegate?
@@ -28,31 +30,9 @@ final class WebViewViewController: UIViewController {
         
         progressView.setProgress(0.1, animated: false)
         progressView.progressViewStyle = .bar
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        webView.addObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        webView.removeObserver(self, forKeyPath:
-        #keyPath(WKWebView.estimatedProgress), context: nil)
-    }
-    
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey : Any]?,
-        context: UnsafeMutableRawPointer?
-    ) {
-        if keyPath == #keyPath(WKWebView.estimatedProgress) {
-            updateProgress()
-        } else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        
+        estimatedProgessObservation = webView.observe(\.estimatedProgress, options: []) { [weak self]  _, _ in
+            self?.updateProgress()
         }
     }
     
