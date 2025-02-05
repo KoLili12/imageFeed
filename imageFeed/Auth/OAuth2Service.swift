@@ -23,8 +23,8 @@ final class OAuth2Service {
     // MARK: - Private functions
     
     private func createURLRequest(code: String) -> URLRequest {
-        guard var urlComponents = URLComponents(string: "https://unsplash.com/oauth/token") else {
-            print("Ошибка createURLRequest")
+        guard var urlComponents = URLComponents(string: "\(Constants.defaultBaseURL)/oauth/token") else {
+            print("Ошибка[OAuth2Service]: ошибка при создании URL")
             return URLRequest(url: Constants.defaultBaseURL)
         }
         urlComponents.queryItems = [
@@ -36,7 +36,7 @@ final class OAuth2Service {
         ]
         
         guard let url = urlComponents.url else {
-            print("Ошибка createURLRequest")
+            print("Ошибка[OAuth2Service]:ошибка при создании URL")
             return URLRequest(url: Constants.defaultBaseURL)
         }
         
@@ -50,6 +50,7 @@ final class OAuth2Service {
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread, "Ошибка: Функция должна быть вызвана на главном потоке")
         guard lastCode != code else {
+            print("Ошибка[OAuth2Service]: FetchError.invalidRequest")
             completion(.failure(FetchError.invalidRequest))
             return
         }

@@ -26,10 +26,10 @@ final class ProfileImageService {
     // MARK: - Functions
     
     func createURLRequest(username: String, authToken: String) -> URLRequest? {
-        guard let urlComponents = URLComponents(string: "https://api.unsplash.com/users/\(username)"),
+        guard let urlComponents = URLComponents(string: "\(Constants.defaultBaseURL)/users/\(username)"),
               let url = urlComponents.url
         else {
-            print("ошибка при создании URL")
+            print("Ошибка[ProfileImageService]: ошибка при создании URL")
             return nil
         }
         
@@ -45,6 +45,7 @@ final class ProfileImageService {
         guard lastUsername != username,
               lastToken != token
         else {
+            print("Ошибка[ProfileImageService]: данные уже извлекаются")
             completion(.failure(FetchError.alreadyFetching))
             return
         }
@@ -64,6 +65,7 @@ final class ProfileImageService {
                 completion(.failure(error))
             case .success(let data):
                 guard let profileImageURL = data.profileImage["small"] else {
+                    print("Ошибка[ProfileImageService]: не удалось извлечение ключа из UserResult.profileImage")
                     completion(.failure(FetchError.keyError))
                     return
                 }

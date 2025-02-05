@@ -29,8 +29,8 @@ class SplashViewController: UIViewController {
         view.addSubview(logoImageView)
         NSLayoutConstraint.activate([
             logoImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-           logoImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
-            ])
+            logoImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
+        ])
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -39,10 +39,12 @@ class SplashViewController: UIViewController {
             fetchProfile(token)
         }
         else {
-            let viewController = AuthViewController()
-            viewController.delegate = self
-            viewController.modalPresentationStyle = .fullScreen
-            present(viewController, animated: true)
+            let storyboard = UIStoryboard(name: "Main", bundle: .main)
+            if let viewController = storyboard.instantiateViewController(withIdentifier: "AuthViewContrloller") as? AuthViewController {
+                viewController.delegate = self
+                viewController.modalPresentationStyle = .fullScreen
+                present(viewController, animated: true)
+            }
         }
     }
     
@@ -68,7 +70,6 @@ class SplashViewController: UIViewController {
         profileService.fetchProfile(token) { [weak self] result in
             UIBlockingProgressHUD.dismiss()
             guard let self = self else { return }
-            
             switch result {
             case .success(let profile):
                 ProfileImageService.shared.fetchProfileImageURL(username: profile.username, token: token) { imageString in
@@ -76,44 +77,12 @@ class SplashViewController: UIViewController {
                     case .success(let urlString):
                         print("urlString: \(urlString)")
                     case .failure(let error):
-                        switch error {
-                        case NetworkError.urlSessionError:
-                            print("сетевая ошибка [fetchProfileImageURL]")
-                        case NetworkError.httpStatusCode(let status):
-                            print("ошибка, которую вернул сервис Unsplash: \(status) [fetchProfileImageURL]")
-                        case NetworkError.urlRequestError(let requestError):
-                            print("сетевая ошибка: \(requestError) [fetchProfileImageURL]")
-                        case FetchError.invalidRequest:
-                            print("Ошикаб при создании URLRequest [fetchProfileImageURL]")
-                        case FetchError.invalidDecoding:
-                            print("ошибка, которую выкинул декодер при получении Profile [fetchProfileImageURL]")
-                        case FetchError.alreadyFetching:
-                            print("данные уже извлекаются [fetchProfileImageURL]")
-                        case FetchError.keyError:
-                            print("Ошибка извлечения ключа из UserResult.profileImage [fetchProfileImageURL]")
-                        default:
-                            print("неизвестная ошибка [fetchProfileImageURL]")
-                        }
+                        print(print("Ошибка[SplashViewController]: \(error)"))
                     }
                 }
                 self.switchToTabBarController()
             case .failure(let error):
-                switch error {
-                case NetworkError.urlSessionError:
-                    print("сетевая ошибка [fetchProfile]")
-                case NetworkError.httpStatusCode(let status):
-                    print("ошибка, которую вернул сервис Unsplash: \(status) [fetchProfile]")
-                case NetworkError.urlRequestError(let requestError):
-                    print("сетевая ошибка: \(requestError) [fetchProfile]")
-                case FetchError.invalidRequest:
-                    print("Ошикаб при создании URLRequest")
-                case FetchError.invalidDecoding:
-                    print("ошибка, которую выкинул декодер при получении Profile [fetchProfile]")
-                case FetchError.alreadyFetching:
-                    print("данные уже извлекаются [fetchProfile]")
-                default:
-                    print("неизвестная ошибка [fetchProfile]")
-                }
+                print("Ошибка[SplashViewController]: \(error)")
             }
         }
     }
