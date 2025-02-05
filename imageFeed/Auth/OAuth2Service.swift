@@ -23,7 +23,7 @@ final class OAuth2Service {
     // MARK: - Private functions
     
     private func createURLRequest(code: String) -> URLRequest? {
-        guard var urlComponents = URLComponents(string: "\(Constants.defaultBaseURL)/oauth/token") else {
+        guard var urlComponents = URLComponents(string: "https://unsplash.com/oauth/token") else {
             print("Ошибка[OAuth2Service]: ошибка при создании URL")
             return nil
         }

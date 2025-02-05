@@ -19,10 +19,10 @@ final class ImagesListService {
     func fetchPhotosNextPage(token: String, completion: @escaping (Result<[PhotoResult], Error>) -> Void) {
         assert(Thread.isMainThread, "Ошибка: Функция должна быть вызвана на главном потоке")
         if task != nil {
+            print("Ошибка[ProfileService]: данные уже извлекаются")
             completion(.failure(FetchError.alreadyFetching))
             return
         }
-        
         let nextPage = (lastLoadedPage ?? 0) + 1
         self.lastLoadedPage = nextPage
         
@@ -31,7 +31,7 @@ final class ImagesListService {
             return
         }
         
-        let task = URLSession.shared.objectData(for: request) { (result: Result<[PhotoResult], Error>) in
+        let task = URLSession.shared.objectData(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
             switch result {
             case .failure(let error):
                 completion(.failure(error))
@@ -42,8 +42,10 @@ final class ImagesListService {
                                       createdAt: Date.from(dateTimeString: item.createdAt),
                                       welcomeDescription: item.description, thumImageURL: item.urls.small, largeImageURL: item.urls.regular, isLiked: false
                                       )
+                    self?.photos.append(photo)
                 }
                 completion(.success(photoResults))
+                NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
             }
         }
         self.task = task
@@ -53,7 +55,7 @@ final class ImagesListService {
     
     func createURLRequest(authToken: String, page: Int) -> URLRequest? {
         guard var urlComponents = URLComponents(string: "https://api.unsplash.com/photos") else {
-            print("Ошибка createURLRequest")
+            print("Ошибка[ImagesListService]: ошибка при создании URL")
             return nil
         }
         
@@ -64,7 +66,7 @@ final class ImagesListService {
         ]
         
         guard let url = urlComponents.url else {
-            print("Ошибка createURLRequest")
+            print("Ошибка[ImagesListService]: ошибка при создании URL")
             return nil
         }
         

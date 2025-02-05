@@ -12,11 +12,12 @@ class SplashViewController: UIViewController {
     // MARK: - Private properties
     
     private let showAuthenticationScreenSegueIdentifier = "showAuthenticationScreen"
+    private let showAuthViewControllerIdentifier = "AuthViewController"
     private let storage = OAuth2TokenStorage()
     private let profileService = ProfileService.shared
     private let imagesService = ImagesListService()
     
-    private let logoImageView: UIImageView = {
+    private lazy var logoImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "launchScreenLogo"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -48,10 +49,12 @@ class SplashViewController: UIViewController {
             }
         }
         else {
-            let viewController = AuthViewController()
-            viewController.delegate = self
-            viewController.modalPresentationStyle = .fullScreen
-            present(viewController, animated: true)
+            let storyboard = UIStoryboard(name: "Main", bundle: .main)
+            if let viewController = storyboard.instantiateViewController(withIdentifier: showAuthViewControllerIdentifier) as? AuthViewController {
+                viewController.delegate = self
+                viewController.modalPresentationStyle = .fullScreen
+                present(viewController, animated: true)
+            }
         }
     }
     
@@ -83,8 +86,8 @@ class SplashViewController: UIViewController {
                     switch imageString {
                     case .success(let image):
                         print("url: \(image)")
-                    case .failure:
-                        break
+                    case .failure(let error):
+                        print("Ошибка[SplashViewController]: \(error)")
                     }
                 }
                 self.switchToTabBarController()
