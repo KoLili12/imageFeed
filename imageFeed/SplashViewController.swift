@@ -14,6 +14,7 @@ class SplashViewController: UIViewController {
     private let showAuthenticationScreenSegueIdentifier = "showAuthenticationScreen"
     private let storage = OAuth2TokenStorage()
     private let profileService = ProfileService.shared
+    private let imagesService = ImagesListService()
     
     private let logoImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "launchScreenLogo"))
@@ -37,6 +38,14 @@ class SplashViewController: UIViewController {
         super.viewDidAppear(animated)
         if let token = storage.token {
             fetchProfile(token)
+            imagesService.fetchPhotosNextPage(token: token) { result in
+                switch result {
+                case .failure(let error):
+                    print(error)
+                case .success(let result):
+                    print()
+                }
+            }
         }
         else {
             let viewController = AuthViewController()
@@ -68,56 +77,51 @@ class SplashViewController: UIViewController {
         profileService.fetchProfile(token) { [weak self] result in
             UIBlockingProgressHUD.dismiss()
             guard let self = self else { return }
-            
-            switch result {
+            let profileRes = errorSuccesHandling(data: result, f: "fetchProfile")
+            switch profileRes {
             case .success(let profile):
                 ProfileImageService.shared.fetchProfileImageURL(username: profile.username, token: token) { imageString in
-                    switch imageString {
-                    case .success(let urlString):
-                        print("urlString: \(urlString)")
-                    case .failure(let error):
-                        switch error {
-                        case NetworkError.urlSessionError:
-                            print("сетевая ошибка [fetchProfileImageURL]")
-                        case NetworkError.httpStatusCode(let status):
-                            print("ошибка, которую вернул сервис Unsplash: \(status) [fetchProfileImageURL]")
-                        case NetworkError.urlRequestError(let requestError):
-                            print("сетевая ошибка: \(requestError) [fetchProfileImageURL]")
-                        case FetchError.invalidRequest:
-                            print("Ошикаб при создании URLRequest [fetchProfileImageURL]")
-                        case FetchError.invalidDecoding:
-                            print("ошибка, которую выкинул декодер при получении Profile [fetchProfileImageURL]")
-                        case FetchError.alreadyFetching:
-                            print("данные уже извлекаются [fetchProfileImageURL]")
-                        case FetchError.keyError:
-                            print("Ошибка извлечения ключа из UserResult.profileImage [fetchProfileImageURL]")
-                        default:
-                            print("неизвестная ошибка [fetchProfileImageURL]")
-                        }
+                    let imageUrlRes = self.errorSuccesHandling(data: imageString, f: "fetchProfileImageURL")
+                    switch imageUrlRes {
+                    case .success(let imag):
+                        print("url: \(imag)")
+                    case .failure:
+                        break
                     }
                 }
                 self.switchToTabBarController()
-            case .failure(let error):
-                switch error {
-                case NetworkError.urlSessionError:
-                    print("сетевая ошибка [fetchProfile]")
-                case NetworkError.httpStatusCode(let status):
-                    print("ошибка, которую вернул сервис Unsplash: \(status) [fetchProfile]")
-                case NetworkError.urlRequestError(let requestError):
-                    print("сетевая ошибка: \(requestError) [fetchProfile]")
-                case FetchError.invalidRequest:
-                    print("Ошикаб при создании URLRequest")
-                case FetchError.invalidDecoding:
-                    print("ошибка, которую выкинул декодер при получении Profile [fetchProfile]")
-                case FetchError.alreadyFetching:
-                    print("данные уже извлекаются [fetchProfile]")
-                default:
-                    print("неизвестная ошибка [fetchProfile]")
-                }
+            case .failure:
+                break
             }
         }
     }
     
+    func errorSuccesHandling<T>(data: Result<T, Error>, f: String) -> Result<T, Error> {
+        switch data {
+        case .success(let result):
+            return .success(result)
+        case .failure(let error):
+            switch error {
+            case NetworkError.urlSessionError:
+                print("сетевая ошибка [\(f)]")
+            case NetworkError.httpStatusCode(let status):
+                print("ошибка, которую вернул сервис Unsplash: \(status) [\(f)]")
+            case NetworkError.urlRequestError(let requestError):
+                print("сетевая ошибка: \(requestError) [\(f)]")
+            case FetchError.invalidRequest:
+                print("Ошикаб при создании URLRequest [\(f)]")
+            case FetchError.invalidDecoding:
+                print("ошибка, которую выкинул декодер при получении Profile [\(f)]")
+            case FetchError.alreadyFetching:
+                print("данные уже извлекаются [\(f)]")
+            case FetchError.keyError:
+                print("Ошибка извлечения ключа из UserResult.profileImage [\(f)]")
+            default:
+                print("неизвестная ошибка [\(f)]")
+            }
+            return .failure(error)
+        }
+    }
 }
 
 // MARK: - AuthViewControllerDelegate
