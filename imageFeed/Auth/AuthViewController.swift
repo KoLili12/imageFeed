@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import ProgressHUD
 
 final class AuthViewController: UIViewController {
     
@@ -71,18 +70,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
             UIBlockingProgressHUD.dismiss()
             switch result {
             case .failure(let error):
-                switch error {
-                case NetworkError.urlSessionError:
-                    print("сетевая ошибка")
-                case NetworkError.httpStatusCode(let status):
-                    print("ошибка, которую вернул сервис Unsplash: \(status)")
-                case NetworkError.urlRequestError(let requestError):
-                    print("сетевая ошибка: \(requestError)")
-                case FetchError.invalidRequest:
-                    print("Ошикаб при создании URLRequest [fetchOAuthToken]")
-                default:
-                    print("неизвестная ошибка")
-                }
+                print("Ошибка[AuthViewController] получения токена: \(error)")
                 showErrorAlert()
             case .success(let data):
                 self.delegate?.didAuthenticate(self)

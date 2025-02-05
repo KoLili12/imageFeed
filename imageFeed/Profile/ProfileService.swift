@@ -7,15 +7,6 @@
 
 import UIKit
 
-
-struct Profile {
-    var username: String
-    var name: String
-    var loginName: String
-    var bio: String
-    
-}
-
 final class ProfileService {
     
     // MARK: - Static properties
@@ -35,13 +26,13 @@ final class ProfileService {
     // MARK: - Functions
     
     private func createURLRequest(authToken: String) -> URLRequest? {
-        guard let urlComponents = URLComponents(string: "https://api.unsplash.com/me") else {
-            print("Ошибка createURLRequest")
+        guard let urlComponents = URLComponents(string: "\(Constants.defaultBaseURL)/me") else {
+            print("Ошибка[ProfileService]: ошибка при создании URL")
             return nil
         }
         
         guard let requestURL = urlComponents.url else {
-            print("Ошибка createURLRequest")
+            print("Ошибка[ProfileService]: ошибка при создании URL")
             return nil
         }
         
@@ -54,6 +45,7 @@ final class ProfileService {
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread, "Ошибка: Функция должна быть вызвана на главном потоке")
         guard lastToken != token else {
+            print("Ошибка[ProfileService]: данные уже извлекаются")
             completion(.failure(FetchError.alreadyFetching))
             return
         }
