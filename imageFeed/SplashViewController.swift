@@ -12,10 +12,11 @@ class SplashViewController: UIViewController {
     // MARK: - Private properties
     
     private let showAuthenticationScreenSegueIdentifier = "showAuthenticationScreen"
+    private let showAuthViewControllerIdentifier = "AuthViewController"
     private let storage = OAuth2TokenStorage()
     private let profileService = ProfileService.shared
     
-    private let logoImageView: UIImageView = {
+    private lazy var logoImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "launchScreenLogo"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -37,10 +38,9 @@ class SplashViewController: UIViewController {
         super.viewDidAppear(animated)
         if let token = storage.token {
             fetchProfile(token)
-        }
-        else {
+        } else {
             let storyboard = UIStoryboard(name: "Main", bundle: .main)
-            if let viewController = storyboard.instantiateViewController(withIdentifier: "AuthViewContrloller") as? AuthViewController {
+            if let viewController = storyboard.instantiateViewController(withIdentifier: showAuthViewControllerIdentifier) as? AuthViewController {
                 viewController.delegate = self
                 viewController.modalPresentationStyle = .fullScreen
                 present(viewController, animated: true)
@@ -94,11 +94,9 @@ class SplashViewController: UIViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
-        
         guard let token = storage.token else {
             return
         }
-        
         fetchProfile(token)
     }
 }

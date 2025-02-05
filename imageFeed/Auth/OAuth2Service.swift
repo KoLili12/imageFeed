@@ -22,10 +22,10 @@ final class OAuth2Service {
     
     // MARK: - Private functions
     
-    private func createURLRequest(code: String) -> URLRequest {
-        guard var urlComponents = URLComponents(string: "\(Constants.defaultBaseURL)/oauth/token") else {
+    private func createURLRequest(code: String) -> URLRequest? {
+        guard var urlComponents = URLComponents(string: "https://unsplash.com/oauth/token") else {
             print("Ошибка[OAuth2Service]: ошибка при создании URL")
-            return URLRequest(url: Constants.defaultBaseURL)
+            return nil
         }
         urlComponents.queryItems = [
             URLQueryItem(name: "client_id", value: Constants.accessKey),
@@ -37,7 +37,7 @@ final class OAuth2Service {
         
         guard let url = urlComponents.url else {
             print("Ошибка[OAuth2Service]:ошибка при создании URL")
-            return URLRequest(url: Constants.defaultBaseURL)
+            return nil
         }
         
         var request = URLRequest(url: url)
@@ -56,7 +56,10 @@ final class OAuth2Service {
         }
         task?.cancel()
         lastCode = code
-        let request = createURLRequest(code: code)
+        guard let request = createURLRequest(code: code) else {
+            completion(.failure(FetchError.invalidRequest))
+            return
+        }
         let task = URLSession.shared.objectData(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             switch result {
             case .failure(let error):

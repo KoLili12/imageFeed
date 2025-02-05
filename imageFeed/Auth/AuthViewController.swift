@@ -70,7 +70,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
             UIBlockingProgressHUD.dismiss()
             switch result {
             case .failure(let error):
-                print(print("Ошибка[AuthViewController]: \(error)"))
+                print("Ошибка[AuthViewController]: \(error)")
                 showErrorAlert()
             case .success(let data):
                 self.delegate?.didAuthenticate(self)

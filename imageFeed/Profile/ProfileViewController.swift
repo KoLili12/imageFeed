@@ -16,7 +16,7 @@ final class ProfileViewController: UIViewController {
     private let profileService = ProfileService.shared
     private var profileImageServiceObserver: NSObjectProtocol?
     
-    private let avatarImage: UIImageView = {
+    private lazy var avatarImage: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "WomanAvatar")
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -29,7 +29,7 @@ final class ProfileViewController: UIViewController {
         return imageView
     }()
     
-    private let nameLabel: UILabel = {
+    private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.text = "Екатерина Новикова"
         label.font = UIFont.systemFont(ofSize: 23, weight: .bold)
@@ -38,7 +38,7 @@ final class ProfileViewController: UIViewController {
         return label
     }()
     
-    private let identifierLabel: UILabel = {
+    private lazy var identifierLabel: UILabel = {
         let label = UILabel()
         label.text = "@eka_novikova"
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
@@ -47,7 +47,7 @@ final class ProfileViewController: UIViewController {
         return label
     }()
     
-    private let descriptionLabel: UILabel = {
+    private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "Hello, world!"
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
@@ -82,7 +82,7 @@ final class ProfileViewController: UIViewController {
             exit.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24)
         ])
         
-        let profileImageServiceObserver = NotificationCenter.default.addObserver(
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
             forName: ProfileImageService.didChangeNotification,
             object: nil, queue: .main
         ) { [weak self] _ in
