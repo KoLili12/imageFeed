@@ -6,12 +6,17 @@
 //
 
 import UIKit
+import Kingfisher
 
-final class ProfileViewController:UIViewController {
+final class ProfileViewController: UIViewController {
     
     // MARK: - Private properties
+
+    private let tokenStorage = OAuth2TokenStorage()
+    private let profileService = ProfileService.shared
+    private var profileImageServiceObserver: NSObjectProtocol?
     
-    private let avatarImage: UIImageView = {
+    private lazy var avatarImage: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "WomanAvatar")
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -19,10 +24,12 @@ final class ProfileViewController:UIViewController {
             imageView.heightAnchor.constraint(equalToConstant: 70),
             imageView.widthAnchor.constraint(equalToConstant: 70)
             ])
+        imageView.layer.cornerRadius = 35
+        imageView.clipsToBounds = true
         return imageView
     }()
     
-    private let nameLabel: UILabel = {
+    private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.text = "Екатерина Новикова"
         label.font = UIFont.systemFont(ofSize: 23, weight: .bold)
@@ -31,7 +38,7 @@ final class ProfileViewController:UIViewController {
         return label
     }()
     
-    private let identifierLabel: UILabel = {
+    private lazy var identifierLabel: UILabel = {
         let label = UILabel()
         label.text = "@eka_novikova"
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
@@ -40,7 +47,7 @@ final class ProfileViewController:UIViewController {
         return label
     }()
     
-    private let descriptionLabel: UILabel = {
+    private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "Hello, world!"
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
@@ -53,6 +60,8 @@ final class ProfileViewController:UIViewController {
         super.viewDidLoad()
         
         let exit = exitButton()
+        
+        self.view.backgroundColor = .ypBlackIOS
         
         view.addSubview(avatarImage)
         view.addSubview(nameLabel)
@@ -72,10 +81,30 @@ final class ProfileViewController:UIViewController {
             exit.centerYAnchor.constraint(equalTo: avatarImage.centerYAnchor),
             exit.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24)
         ])
+        
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.didChangeNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            self.updateAvater()
+        }
+        updateAvater()
+        
+        updateProfileDetails(profile: profileService.profile)
+        
+        
     }
     
     // MARK: - Private functions
     
+    private func updateAvater() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        avatarImage.kf.setImage(with: url)
+    }
     @objc private func didTapExitButton() {
         let alert = UIAlertController(title: "Пока, пока!", message: "Уверены что хотите выйти?", preferredStyle: .alert)
         
@@ -105,5 +134,11 @@ final class ProfileViewController:UIViewController {
             button.widthAnchor.constraint(equalToConstant: 44),
         ])
         return button
+    }
+    
+    func updateProfileDetails(profile: Profile?) {
+        nameLabel.text = profile?.name ?? ""
+        identifierLabel.text = profile?.loginName ?? ""
+        descriptionLabel.text = profile?.bio
     }
 }

@@ -12,18 +12,39 @@ class SplashViewController: UIViewController {
     // MARK: - Private properties
     
     private let showAuthenticationScreenSegueIdentifier = "showAuthenticationScreen"
+    private let showAuthViewControllerIdentifier = "AuthViewController"
     private let storage = OAuth2TokenStorage()
+    private let profileService = ProfileService.shared
+    
+    private lazy var logoImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "launchScreenLogo"))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
     
     // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .ypBlackIOS
+        view.addSubview(logoImageView)
+        NSLayoutConstraint.activate([
+            logoImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            logoImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
+        ])
+    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if let token = storage.token {
-            switchToTabBarController()
-            print(token)
-        }
-        else {
-            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            fetchProfile(token)
+        } else {
+            let storyboard = UIStoryboard(name: "Main", bundle: .main)
+            if let viewController = storyboard.instantiateViewController(withIdentifier: showAuthViewControllerIdentifier) as? AuthViewController {
+                viewController.delegate = self
+                viewController.modalPresentationStyle = .fullScreen
+                present(viewController, animated: true)
+            }
         }
     }
     
@@ -44,27 +65,28 @@ class SplashViewController: UIViewController {
         window.rootViewController = tabBarController
     }
     
-}
-
-// MARK: - Prepare function
-
-extension SplashViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Проверим, что переходим на авторизацию
-        if segue.identifier == showAuthenticationScreenSegueIdentifier {
-            guard
-                let navigationController = segue.destination as? UINavigationController,
-                let viewController = navigationController.viewControllers[0] as? AuthViewController
-            else {
-                assertionFailure("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")
-                return
+    private func fetchProfile(_ token: String) {
+        UIBlockingProgressHUD.show()
+        profileService.fetchProfile(token) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            guard let self = self else { return }
+            switch result {
+            case .success(let profile):
+                ProfileImageService.shared.fetchProfileImageURL(username: profile.username, token: token) { imageString in
+                    switch imageString {
+                    case .success(let urlString):
+                        print("urlString: \(urlString)")
+                    case .failure(let error):
+                        print(print("Ошибка[SplashViewController]: \(error)"))
+                    }
+                }
+                self.switchToTabBarController()
+            case .failure(let error):
+                print("Ошибка[SplashViewController]: \(error)")
             }
-            // Установим делегатом контроллера наш SplashViewController
-            viewController.delegate = self
-        } else {
-            super.prepare(for: segue, sender: sender)
         }
     }
+    
 }
 
 // MARK: - AuthViewControllerDelegate
@@ -72,8 +94,9 @@ extension SplashViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
-        switchToTabBarController()
+        guard let token = storage.token else {
+            return
+        }
+        fetchProfile(token)
     }
-    
-    
 }
