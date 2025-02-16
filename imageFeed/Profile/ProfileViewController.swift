@@ -92,8 +92,6 @@ final class ProfileViewController: UIViewController {
         updateAvater()
         
         updateProfileDetails(profile: profileService.profile)
-        
-        
     }
     
     // MARK: - Private functions
@@ -109,7 +107,8 @@ final class ProfileViewController: UIViewController {
         let alert = UIAlertController(title: "Пока, пока!", message: "Уверены что хотите выйти?", preferredStyle: .alert)
         
         let yesAction = UIAlertAction(title: "Да", style: .default) { _ in
-            
+            let profileLogoutService = ProfileLogoutService.shared
+            profileLogoutService.logout()
         }
         
         let noAction = UIAlertAction(title: "Нет", style: .cancel) { _ in

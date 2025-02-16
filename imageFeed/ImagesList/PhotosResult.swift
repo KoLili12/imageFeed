@@ -7,6 +7,11 @@
 
 import Foundation
 
+struct PhotoLikeResponse: Decodable {
+    let photo: PhotoResult
+}
+
+
 struct PhotoResult: Decodable {
     let id: String
     let createdAt: String
@@ -15,6 +20,7 @@ struct PhotoResult: Decodable {
     let height: Int
     let description: String?
     let urls: UrlsResult
+    let likedByUser: Bool
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -24,6 +30,7 @@ struct PhotoResult: Decodable {
         case height
         case description
         case urls
+        case likedByUser = "liked_by_user"
     }
 }
 

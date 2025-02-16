@@ -15,7 +15,6 @@ class SplashViewController: UIViewController {
     private let showAuthViewControllerIdentifier = "AuthViewController"
     private let storage = OAuth2TokenStorage()
     private let profileService = ProfileService.shared
-    private let imagesService = ImagesListService()
     
     private lazy var logoImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "launchScreenLogo"))
@@ -39,14 +38,6 @@ class SplashViewController: UIViewController {
         super.viewDidAppear(animated)
         if let token = storage.token {
             fetchProfile(token)
-            imagesService.fetchPhotosNextPage(token: token) { result in
-                switch result {
-                case .failure(let error):
-                    print(error)
-                case .success(let result):
-                    print()
-                }
-            }
         }
         else {
             let storyboard = UIStoryboard(name: "Main", bundle: .main)

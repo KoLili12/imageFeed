@@ -75,4 +75,8 @@ final class ProfileService {
         self.task = task
         task.resume()
     }
+    
+    func deleteProfile() {
+        ProfileService.shared.profile = nil
+    }
 }
