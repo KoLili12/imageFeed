@@ -19,14 +19,13 @@ final class ImagesListCell: UITableViewCell {
     
     private let isLiked: Bool = false
     
-    // MARK: - Internal properties
-    
-    weak var delegate: ImagesListCellDelegate?
-    
-    @IBAction func didTapLikeButton(_ sender: Any) {
+    @IBAction private func didTapLikeButton(_ sender: Any) {
         delegate?.imageListCellDidTapLike(self)
     }
     
+    // MARK: - Internal properties
+    
+    weak var delegate: ImagesListCellDelegate?
     
     // MARK: - Static properties
     

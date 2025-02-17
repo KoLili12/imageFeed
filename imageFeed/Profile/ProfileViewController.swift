@@ -104,23 +104,28 @@ final class ProfileViewController: UIViewController {
         avatarImage.kf.setImage(with: url)
     }
     @objc private func didTapExitButton() {
-        let alert = UIAlertController(title: "Пока, пока!", message: "Уверены что хотите выйти?", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Пока, пока!", message: "Уверены, что хотите выйти?", preferredStyle: .alert)
         
-        let yesAction = UIAlertAction(title: "Да", style: .default) { _ in
+        let yesAction = UIAlertAction(title: "Да", style: .cancel) { _ in
             let profileLogoutService = ProfileLogoutService.shared
             profileLogoutService.logout()
+            // Получаем экземпляр `window` приложения
+            guard let window = UIApplication.shared.windows.first else {
+                assertionFailure("Invalid window configuration")
+                return
+            }
+            // Установим в `rootViewController` полученный контроллер
+            window.rootViewController = SplashViewController()
         }
         
-        let noAction = UIAlertAction(title: "Нет", style: .cancel) { _ in
-            
-        }
+        let noAction = UIAlertAction(title: "Нет", style: .default) { _ in }
 
         alert.addAction(yesAction)
         alert.addAction(noAction)
-        
+
         self.present(alert, animated: true, completion: nil)
-        
     }
+
     
     // MARK: - Private functions
     

@@ -17,7 +17,6 @@ final class ImagesListViewController: UIViewController {
     private var photos: [Photo] = []
     private var imagesListServiceObserver: NSObjectProtocol?
     private var imagesListService = ImagesListService.shared
-    private let currentDate = Date()
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
@@ -98,6 +97,7 @@ extension ImagesListViewController: UITableViewDataSource {
     
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         cell.delegate = self
+        cell.selectionStyle = .none
         guard let mockPhoto = UIImage(named: "MockPicture") else { return }
         guard let newPhotoURL = URL(string: imagesListService.photos[indexPath.row].thumImageURL) else { return }
         cell.cellImage?.kf.indicatorType = .activity
@@ -109,7 +109,7 @@ extension ImagesListViewController: UITableViewDataSource {
                 print("Ошибка[ImagesListService]: ошибка загрузки: \(error.localizedDescription)")
             }
         }
-        cell.dateLabel?.text = dateFormatter.string(from: currentDate)
+        cell.dateLabel?.text = photos[indexPath.row].createdAt?.toRussianFormat() ?? ""
         let likeImage = photos[indexPath.row].isLiked ? UIImage(named: "ActiveLike") : UIImage(named: "InactiveLike")
         cell.likeButton.setImage(likeImage, for: .normal)
     }
@@ -157,6 +157,7 @@ extension ImagesListViewController: ImagesListCellDelegate {
                 UIBlockingProgressHUD.dismiss()
                 print("Поставлен/убран лайк")
             case .failure(let error):
+                UIBlockingProgressHUD.dismiss()
                 self.showErrorAlert()
                 print("Ошибка[ImagesListService]: ошибка проставления лайка: \(error.localizedDescription)")
             }

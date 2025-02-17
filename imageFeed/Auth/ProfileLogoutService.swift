@@ -19,7 +19,6 @@ final class ProfileLogoutService {
     func logout() {
         clearCookies()
         cleanData()
-        exitProfile()
     }
     
     private func clearCookies() {
@@ -37,15 +36,5 @@ final class ProfileLogoutService {
         profileService.deleteProfile()
         profileImageService.deleteAvatarURL()
         imagesListService.deletePhotos()
-    }
-    
-    private func exitProfile() {
-        // Получаем экземпляр `window` приложения
-        guard let window = UIApplication.shared.windows.first else {
-            assertionFailure("Invalid window configuration")
-            return
-        }
-        // Установим в `rootViewController` полученный контроллер
-        window.rootViewController = SplashViewController()
     }
 }

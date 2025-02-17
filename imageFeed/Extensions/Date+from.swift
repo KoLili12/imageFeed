@@ -9,15 +9,13 @@ import Foundation
 
 extension Date {
     static func from(dateTimeString: String) -> Date? {
-        return DateFormatter.defaultDateTime.date(from: dateTimeString)
+        return ISO8601DateFormatter().date(from: dateTimeString)
+    }
+
+    func toRussianFormat() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "d MMMM yyyy"
+        return formatter.string(from: self)
     }
 }
-
-private extension DateFormatter {
-    static let defaultDateTime: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        return dateFormatter
-    }()
-}
-
