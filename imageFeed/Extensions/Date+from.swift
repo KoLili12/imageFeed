@@ -8,14 +8,25 @@
 import Foundation
 
 extension Date {
+    private static let isoFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        return formatter
+    }()
+
+    private static let russianFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "d MMMM yyyy"
+        return formatter
+    }()
+
     static func from(dateTimeString: String) -> Date? {
-        return ISO8601DateFormatter().date(from: dateTimeString)
+        return isoFormatter.date(from: dateTimeString)
     }
 
     func toRussianFormat() -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ru_RU")
-        formatter.dateFormat = "d MMMM yyyy"
-        return formatter.string(from: self)
+        return Date.russianFormatter.string(from: self)
     }
 }
