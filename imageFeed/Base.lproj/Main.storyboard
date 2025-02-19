@@ -68,6 +68,9 @@
                                                     </constraints>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" image="InactiveLike" title=""/>
+                                                    <connections>
+                                                        <action selector="didTapLikeButton:" destination="np9-kG-vhF" eventType="touchUpInside" id="AMP-IU-daS"/>
+                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <constraints>

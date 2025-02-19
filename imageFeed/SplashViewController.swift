@@ -74,19 +74,18 @@ class SplashViewController: UIViewController {
             case .success(let profile):
                 ProfileImageService.shared.fetchProfileImageURL(username: profile.username, token: token) { imageString in
                     switch imageString {
-                    case .success(let urlString):
-                        print("urlString: \(urlString)")
+                    case .success(let image):
+                        print("url: \(image)")
                     case .failure(let error):
-                        print(print("Ошибка[SplashViewController]: \(error)"))
+                        print("Ошибка[SplashViewController]: \(error)")
                     }
                 }
                 self.switchToTabBarController()
-            case .failure(let error):
-                print("Ошибка[SplashViewController]: \(error)")
+            case .failure:
+                break
             }
         }
     }
-    
 }
 
 // MARK: - AuthViewControllerDelegate

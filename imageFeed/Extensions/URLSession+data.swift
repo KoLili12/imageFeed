@@ -48,7 +48,7 @@ extension URLSession {
         let data = data(for: request) { result in
             switch result {
             case .failure(let error):
-                print("Ошибка загрузки данных: \(error)")
+                print("Ошибка загрузки данных [URLSession]: \(error)")
                 completion(.failure(error))
             case .success(let data):
                 do {

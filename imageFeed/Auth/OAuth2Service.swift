@@ -36,7 +36,7 @@ final class OAuth2Service {
         ]
         
         guard let url = urlComponents.url else {
-            print("Ошибка[OAuth2Service]:ошибка при создании URL")
+            print("Ошибка[OAuth2Service]: ошибка при создании URL")
             return nil
         }
         
@@ -50,8 +50,8 @@ final class OAuth2Service {
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread, "Ошибка: Функция должна быть вызвана на главном потоке")
         guard lastCode != code else {
-            print("Ошибка[OAuth2Service]: FetchError.invalidRequest")
-            completion(.failure(FetchError.invalidRequest))
+            print("Ошибка[OAuth2Service]: данные уже извлекаются")
+            completion(.failure(FetchError.alreadyFetching))
             return
         }
         task?.cancel()

@@ -6,19 +6,24 @@
 //
 
 import UIKit
-
+import Kingfisher
 final class SingleImageViewController: UIViewController {
     
     // MARK: - Internal properties
-    
-    var image: UIImage? {
+    var imageURL: URL? {
         didSet {
-            guard isViewLoaded, let image else { return }
-            imageView.image = image
-            imageView.frame.size = image.size
-            rescaleAndCenterImageInScrollView(image: image)
+            guard isViewLoaded, let imageURL else { return }
+            downloadImage(url: imageURL)
         }
     }
+//    var image: UIImage? {
+//        didSet {
+//            guard isViewLoaded, let image else { return }
+//            imageView.image = image
+//            imageView.frame.size = image.size
+//            rescaleAndCenterImageInScrollView(image: image)
+//        }
+//    }
     
     // MARK: - @IBOutlet properties
     
@@ -43,10 +48,8 @@ final class SingleImageViewController: UIViewController {
         super.viewDidLoad()
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
-        guard let image else { return }
-        imageView.image = image
-        imageView.frame.size = image.size
-        rescaleAndCenterImageInScrollView(image: image)
+        guard let imageURL else { return }
+        downloadImage(url: imageURL)
     }
     
     // MARK: - private function
@@ -66,6 +69,37 @@ final class SingleImageViewController: UIViewController {
         let x = (newContentSize.width - visibleRectSize.width) / 2
         let y = (newContentSize.height - visibleRectSize.height) / 2
         scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+    }
+    
+    private func downloadImage(url: URL) {
+        UIBlockingProgressHUD.show()
+        imageView.kf.setImage(with: url) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            guard let self = self else { return }
+            switch result {
+            case .success(let newImage):
+                self.imageView.frame.size = newImage.image.size
+                self.rescaleAndCenterImageInScrollView(image: newImage.image)
+                print("Картинка в SingleImageViewController загружена")
+            case .failure(let error):
+                self.showErrorAlert()
+                print("Ошибка[SingleImageViewController]: ошибка загрузки: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func showErrorAlert() {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так. Попробовать ещё раз",
+            message: nil,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Повторить", style: .default) { [weak self] _ in
+            guard let self, let imageURL = self.imageURL else { return }
+            self.downloadImage(url: imageURL)
+        })
+        alert.addAction(UIAlertAction(title: "Не надо", style: .cancel))
+        self.present(alert, animated: true)
     }
 }
 

@@ -45,6 +45,7 @@ final class ProfileService {
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread, "Ошибка: Функция должна быть вызвана на главном потоке")
         guard lastToken != token else {
+            print("Ошибка[ProfileService]: данные уже извлекаются")
             completion(.failure(FetchError.alreadyFetching))
             return
         }
@@ -73,5 +74,9 @@ final class ProfileService {
         }
         self.task = task
         task.resume()
+    }
+    
+    func deleteProfile() {
+        ProfileService.shared.profile = nil
     }
 }
