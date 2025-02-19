@@ -38,8 +38,7 @@ class SplashViewController: UIViewController {
         super.viewDidAppear(animated)
         if let token = storage.token {
             fetchProfile(token)
-        }
-        else {
+        } else {
             let storyboard = UIStoryboard(name: "Main", bundle: .main)
             if let viewController = storyboard.instantiateViewController(withIdentifier: showAuthViewControllerIdentifier) as? AuthViewController {
                 viewController.delegate = self
@@ -94,11 +93,9 @@ class SplashViewController: UIViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
-        
         guard let token = storage.token else {
             return
         }
-        
         fetchProfile(token)
     }
 }
