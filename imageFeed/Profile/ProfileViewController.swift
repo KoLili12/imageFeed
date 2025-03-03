@@ -8,13 +8,12 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController & ProfileViewControllerProtocol {
     
     // MARK: - Private properties
-
-    private let tokenStorage = OAuth2TokenStorage()
-    private let profileService = ProfileService.shared
     private var profileImageServiceObserver: NSObjectProtocol?
+    
+    var presenter: (any ProfilePresenterProtocol)?
     
     private lazy var avatarImage: UIImageView = {
         let imageView = UIImageView()
@@ -87,43 +86,19 @@ final class ProfileViewController: UIViewController {
             object: nil, queue: .main
         ) { [weak self] _ in
             guard let self else { return }
-            self.updateAvater()
+            presenter?.updateAvater()
         }
-        updateAvater()
-        
-        updateProfileDetails(profile: profileService.profile)
+        presenter?.viewDidLoad()
     }
     
     // MARK: - Private functions
     
-    private func updateAvater() {
-        guard
-            let profileImageURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: profileImageURL)
-        else { return }
+    func updateAvatar(with url: URL?) {
+        guard let url else { return }
         avatarImage.kf.setImage(with: url)
     }
-    @objc private func didTapExitButton() {
-        let alert = UIAlertController(title: "Пока, пока!", message: "Уверены, что хотите выйти?", preferredStyle: .alert)
-        
-        let yesAction = UIAlertAction(title: "Да", style: .cancel) { _ in
-            let profileLogoutService = ProfileLogoutService.shared
-            profileLogoutService.logout()
-            // Получаем экземпляр `window` приложения
-            guard let window = UIApplication.shared.windows.first else {
-                assertionFailure("Invalid window configuration")
-                return
-            }
-            // Установим в `rootViewController` полученный контроллер
-            window.rootViewController = SplashViewController()
-        }
-        
-        let noAction = UIAlertAction(title: "Нет", style: .default) { _ in }
-
-        alert.addAction(yesAction)
-        alert.addAction(noAction)
-
-        self.present(alert, animated: true, completion: nil)
+    @objc func didTapExitButton() {
+        presenter?.didTapExitButton()
     }
 
     
@@ -131,6 +106,7 @@ final class ProfileViewController: UIViewController {
     
     private func exitButton() -> UIButton {
         let button = UIButton.systemButton(with: UIImage(named: "Exit") ?? UIImage(), target: self, action: #selector(self.didTapExitButton))
+        button.accessibilityIdentifier = "logout button"
         button.tintColor = .ypRedIOS
         button.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
