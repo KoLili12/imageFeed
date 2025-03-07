@@ -72,13 +72,12 @@ final class ImagesListPresenter: @preconcurrency ImagesListPresenterProtocol {
             case .success:
                 cell.setIsLiked(photo.isLiked)
                 view?.updateRow(at: indexPath)
-                UIBlockingProgressHUD.dismiss()
                 print("Поставлен/убран лайк")
             case .failure(let error):
-                UIBlockingProgressHUD.dismiss()
                 view?.showErrorAlert()
                 print("Ошибка[ImagesListService]: ошибка проставления лайка: \(error.localizedDescription)")
             }
+            UIBlockingProgressHUD.dismiss()
         }
     }
     

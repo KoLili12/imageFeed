@@ -9,9 +9,9 @@ import Foundation
 
 final class AuthHelper: AuthHelperProtocol {
     
-    // MARK: - Internal Properties
+    // MARK: - Private Properties
     
-    let configuration: AuthConfiguration
+    private let configuration: AuthConfiguration
     
     // MARK: - Init
     

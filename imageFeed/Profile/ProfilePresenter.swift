@@ -15,6 +15,7 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     weak var view: (any ProfileViewControllerProtocol)?
     private let profileImageService = ProfileImageService.shared
     private let profileService = ProfileService.shared
+    private let profileLogoutService = ProfileLogoutService.shared
     
     // MARK: - Internal functions
     
@@ -40,8 +41,8 @@ final class ProfilePresenter: ProfilePresenterProtocol {
         
         alert.view.accessibilityIdentifier = "Bye bye!"
         
-        let yesAction = UIAlertAction(title: "Да", style: .cancel) { _ in
-            let profileLogoutService = ProfileLogoutService.shared
+        let yesAction = UIAlertAction(title: "Да", style: .cancel) { [weak self] _ in
+            guard let self = self else { return }
             profileLogoutService.logout()
             guard let window = UIApplication.shared.windows.first else {
                 assertionFailure("Invalid window configuration")

@@ -61,9 +61,9 @@ final class ProfileService {
                 completion(.failure(error))
             case .success(let data):
                 let profile = Profile(
-                    username:  data.username,
-                    name:  data.firstName + " " + data.lastName,
-                    loginName:  "@\(data.username)",
+                    username:  data.username ?? "",
+                    name:  (data.firstName ?? "") + " " + (data.lastName ??  ""),
+                    loginName:  "@\(data.username ?? "")",
                     bio: data.bio ?? ""
                 )
                 self?.profile = profile

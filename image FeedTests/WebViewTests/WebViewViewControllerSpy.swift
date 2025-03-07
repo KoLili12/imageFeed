@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import imageFeed
+@testable import imageFeed
 
 final class WebViewViewControllerSpy: WebViewViewControllerProtocol {
     var presenter: imageFeed.WebViewPresenterProtocol?

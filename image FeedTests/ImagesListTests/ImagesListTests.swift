@@ -33,7 +33,7 @@ final class ImagesListTests: XCTestCase {
         imagesListController.presenter = imagesListPresenter
         
         // when
-        let _ = imagesListController.presenter?.getPhotoHeight(indexPath: IndexPath(), tableWidth: 1)
+        let _ = imagesListController.tableView(UITableView(), heightForRowAt: IndexPath())
         
         // then
         XCTAssertTrue(imagesListPresenter.getPhotoHeightIsCalled)
@@ -48,8 +48,17 @@ final class ImagesListTests: XCTestCase {
         imagesListPresenter.view = imagesListController
         imagesListController.presenter = imagesListPresenter
         
-        // when
-        let _ = imagesListController.presenter?.changeLikeStatus(for: IndexPath(), cell: ImagesListCell())
+        imagesListController.loadViewIfNeeded()
+        
+        let mockTableView = UITableViewMock()
+        imagesListController.setValue(mockTableView, forKey: "tableView")
+        
+        let cell = ImagesListCell()
+        let indexPath = IndexPath(row: 0, section: 0)
+        mockTableView.indexPathToReturn = indexPath
+        
+        // When
+        imagesListController.imageListCellDidTapLike(cell)
         
         // then
         XCTAssertTrue(imagesListPresenter.changeLikeStatusIsCalled)

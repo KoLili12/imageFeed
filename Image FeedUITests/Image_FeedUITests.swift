@@ -6,14 +6,20 @@
 //
 
 import XCTest
+@testable import imageFeed
 
 class Image_FeedUITests: XCTestCase {
     private let app = XCUIApplication() // переменная приложения
     
     override func setUpWithError() throws {
-        continueAfterFailure = false // настройка выполнения тестов, которая прекратит выполнения тестов, если в тесте что-то пошло не так
-        
-        app.launch() // запускаем приложение перед каждым тестом
+        // Настройка перед каждым тестом
+        continueAfterFailure = false
+        app.launch()
+    }
+    
+    override func tearDownWithError() throws {
+        // Очистка после каждого теста
+        app.terminate()
     }
     
     // MARK: - Authorization in the application
@@ -29,16 +35,21 @@ class Image_FeedUITests: XCTestCase {
         XCTAssertTrue(loginTextField.waitForExistence(timeout: 5))
         
         loginTextField.tap()
+        Thread.sleep(forTimeInterval: 0.5)
         loginTextField.typeText("<Ваш e-mail>")
+        
         webView.swipeUp()
         
         let passwordTextField = webView.descendants(matching: .secureTextField).element
         XCTAssertTrue(passwordTextField.waitForExistence(timeout: 5))
         
         passwordTextField.tap()
-        if !passwordTextField.hasFocus {
-            passwordTextField.tap()
-        }
+        Thread.sleep(forTimeInterval: 1.0)
+        
+        Thread.sleep(forTimeInterval: 0.5)
+        passwordTextField.tap()
+        Thread.sleep(forTimeInterval: 0.5)
+
         passwordTextField.typeText("<Ваш пароль>")
         webView.swipeUp()
         
