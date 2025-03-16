@@ -14,6 +14,8 @@ class Image_FeedUITests: XCTestCase {
     override func setUpWithError() throws {
         // Настройка перед каждым тестом
         continueAfterFailure = false
+        // Добавляем launch argument для отключения автоматической пагинации
+        app.launchArguments = ["--uitesting"]
         app.launch()
     }
     
