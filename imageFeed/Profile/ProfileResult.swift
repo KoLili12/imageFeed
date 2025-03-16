@@ -8,9 +8,9 @@
 import UIKit
 
 struct ProfileResult: Decodable {
-    var username: String
-    var firstName: String
-    var lastName: String
+    var username: String?
+    var firstName: String?
+    var lastName: String?
     var bio: String?
     
     enum CodingKeys: String, CodingKey {

@@ -12,5 +12,4 @@ struct Profile {
     var name: String
     var loginName: String
     var bio: String
-    
 }
